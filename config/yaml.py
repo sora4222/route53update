@@ -19,8 +19,11 @@ class Config(object):
             self.zone_id = loader["zone_id"]
             self.ttl = loader["recordset"]
             self.record_type = loader["record_type"]
-            self.records: List[str] = [key for key in loader.keys() if key.startswith("recordset")]
             self.ip_log_location: str = loader["ip_log_location"]
+            self.hosted_zone_id: str = loader["hosted_zone_id"]
+
+            # Each of these needs to be fully qualified domain name
+            self.records: List[str] = [key for key in loader.keys() if key.startswith("recordset")]
 
         except KeyError as error:
             logging.critical(message_formatter(("message", f"the configuration file is not valid"),

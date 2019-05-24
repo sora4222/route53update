@@ -3,7 +3,8 @@
 This module is to create a python version of the
 :author: Jesse Ross
 """
-import boto3
+import boto.route53
+import boto.route53.record
 from config.yaml import Config
 from logging_dec import message_formatter
 import logging
@@ -40,11 +41,19 @@ def get_external_ip() -> str:
     return ip
 
 
-def update_record(recordname: str, ip_external: str):
-    route_53_client = boto3.client("route53")
-    response = route_53_client.change_resource_record_sets(
-        HostedZoneId
-    )
+def update_record(recordname: str, ip_external: str, zone_id: str):
+    try:
+        route53_conn = boto.route53.connect_to_region("ap-southeast-2")
+        change_record = boto.route53.record.ResourceRecordSets(
+            connection=route53_conn, hosted_zone_id=zone_id)
+        changes = change_record.add_change(action="UPSERT", name=recordname, type="A")
+        changes.add_value(ip_external)
+        change_record.commit()
+    except boto.exception.BotoClientError | boto.exception.AWSConnectionError as exc:
+        logging.critical(message_formatter(("message", "An exception occured setting the update_record"),
+                                           ("error", str(exc))
+                                           ))
+        exit(1)
 
 
 def is_ip_same_as_previous(new_ip: str, ip_log_location: str) -> bool:
@@ -71,7 +80,7 @@ if __name__ == '__main__':
     if is_ip_same_as_previous(config.ip_log_location):
         for record in config.records:
             logging.info(message_formatter(("action", f"starting record: {record}")))
-            update_record(record, ip)
+            update_record(record, ip, config.hosted_zone_id)
             logging.info(message_formatter(("action", f"finished record: {record}")))
     else:
         logging.info(message_formatter(("message", "The ip-address has not changed.")))
