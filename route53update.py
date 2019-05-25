@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 """
 This module is to create a python version of the
 :author: Jesse Ross
