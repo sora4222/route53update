@@ -9,7 +9,7 @@ def message_formatter(*args) -> str:
     """
     now_val = datetime.now()
     to_log = "{ "
-    to_log = to_log + "\"date_time\": \"" + now_val.strftime("%Y %m %d %H %M %S") + "\""
+    to_log = to_log + "\"date_time\": \"" + now_val.strftime("%Y %m %d %H %M %S %f") + "\""
     for key, value in args:
         to_log += ", "
         to_log += f"\"{key}\": \"{value}\""

@@ -1,0 +1,7 @@
+---
+ip_log_location: "route53testlocation.log"
+logging_location: "location.log"
+hosted_zone_id: "The big zone id"
+recordset:
+  - "www.example.com."
+  - "example.com."
